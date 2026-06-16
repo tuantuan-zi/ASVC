@@ -1,0 +1,7 @@
+# Python 缓存
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter Notebook 检查点
+.ipynb_checkpoints/

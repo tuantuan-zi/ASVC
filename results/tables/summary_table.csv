@@ -1,0 +1,11 @@
+Dataset,Method,ARI,NMI,n_SV,n_BSV
+TwoMoons,SVC,1.000,1.000,53,0
+TwoMoons,ASVC,0.428,0.604,113,0
+ConcentricCircles,SVC,1.000,1.000,75,0
+ConcentricCircles,ASVC,0.711,0.703,118,0
+ThreeBlobs,SVC,1.000,1.000,20,0
+ThreeBlobs,ASVC,0.985,0.975,91,0
+OverlappingGaussians,SVC,0.000,0.000,46,0
+OverlappingGaussians,ASVC,0.985,0.975,90,0
+TwoMoonsNoisy,SVC,0.000,0.000,72,0
+TwoMoonsNoisy,ASVC,0.960,0.922,107,0
