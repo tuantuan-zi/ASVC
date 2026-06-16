@@ -1,0 +1,41 @@
+\section{Related Work}
+
+\subsection{Theoretical Foundations of SVC}
+
+SVC traces its theoretical roots to Vapnik's SVM framework~\cite{scholkopf2002} and its extension to density estimation. Tax and Duin~\cite{tax1999,tax2004} proposed SVDD, providing the direct optimization form for SVC: seeking the minimal hypersphere that tightly envelops the data in feature space. Ben-Hur \etal~\cite{benhur2001} extended SVDD into a complete clustering framework by introducing a connectivity-checking mechanism for multi-cluster label assignment.
+
+Solving the dual QP of Eq.~\eqref{eq:svc_qp}, data points are classified into three categories by their $\alpha_i$ values: (i)~interior points ($\alpha_i\approx0$), inside the sphere and not participating in its definition; (ii)~support vectors (SV, $0<\alpha_i<C$), on the sphere surface and defining its geometry; (iii)~bounded support vectors (BSV, $\alpha_i\approx C$), outside the sphere, representing outliers or noise.
+
+For any point $y$, its squared feature-space distance to the sphere center $a$ is:
+\begin{equation}
+\begin{split}
+R^2(y)=\|\phi(y)-a\|^2=K(y,y) \\
+-2\sum_i\alpha_i K(y,x_i)+\sum_{i,j}\alpha_i\alpha_j K(x_i,x_j)
+\end{split}
+\end{equation}
+
+The sphere radius $R$ is taken as the median $R^2$ value over support vectors. Connectivity labeling operates by checking, for each pair of spatially close points $(x_i,x_j)$, whether the sampled points $y_t=x_i+t(x_j-x_i)$ along the connecting segment satisfy $R^2(y_t)\leq R^2$ for all $t\in[0,1]$.
+
+\subsection{Improvements and Variants of SVC}
+
+Since SVC's introduction, research has advanced along three main directions.
+
+\textbf{Connectivity labeling efficiency.} The original SVC requires segment sampling for all $O(N^2)$ point pairs, yielding $O(N^3)$ complexity. Lee and Lee~\cite{lee2005} proposed an adjacency-matrix and graph-connected-component method reducing it to $O(N^2)$. Yang \etal~\cite{yang2002} introduced proximity graph modeling, limiting the number of point pairs needing checking. Our SVC implementation adopts $k$-NN graph filtering, checking only each point's $k$ spatial nearest neighbors, reducing to $O(kN)$.
+
+\textbf{Dynamic characterization of cluster labels.} Lee and Lee~\cite{lee2007} proposed tracking the stability of cluster structures across different $(q,C)$ values to assist parameter selection. The core observation is that cluster structure remains relatively stable within appropriate parameter intervals. However, this method still requires human interpretation of ``stability intervals'' and has not achieved full automation.
+
+\textbf{Large-scale extensions.} Researchers have explored acceleration strategies including core-set approximation~\cite{tsang2006}, random feature mapping~\cite{rahimi2008}, and convex clustering equivalence~\cite{hofmann2008}, focusing primarily on computational efficiency rather than parameter automation.
+
+\subsection{Parameter Selection in Kernel Methods}
+
+Parameter selection for kernel methods is a broad research problem. In supervised SVMs, parameters (e.g., $C$ and $\gamma$) are typically selected via $k$-fold cross-validation using labels~\cite{scholkopf2002}. In unsupervised settings, the problem is far more difficult.
+
+Scholkopf~\etal~\cite{scholkopf2001} introduced the $\nu$-parameter in one-class SVM to control the outlier fraction, providing a more intuitive alternative to the raw $C$ parameter. $\nu$ is defined as an upper bound on the outlier fraction and a lower bound on the SV fraction. ASVC inherits this parameterization, replacing $C$ with $C=1/(\nu N)$, giving the parameter a probabilistic interpretation.
+
+Wang and Zhu~\cite{wang2008} proposed a stability-based parameter selection method for SVC, identifying effective parameters by tracking the stability intervals of cluster counts as $q$ varies. The underlying assumption is that clustering within a stability interval has physical meaning. However, this assumption fails on certain datasets---as shown in our experiments, OverlappingGaussians yields no effective clustering for manual SVC at any $q$, hence no ``stability interval'' exists.
+
+\subsection{Clustering Evaluation Metrics}
+
+Clustering evaluation falls into external and internal categories. External metrics require labels: Adjusted Rand Index (ARI)~\cite{hubert1985}, Normalized Mutual Information (NMI)~\cite{strehl2002}, Homogeneity, and Completeness~\cite{rosenberg2007}. We use ARI and NMI as primary quantitative metrics.
+
+Internal metrics (Silhouette~\cite{rousseeuw1987}, Davies-Bouldin~\cite{davies1979}, Calinski-Harabasz~\cite{calinski1974}) do not require labels but are based on Euclidean distance measures that do not fully match SVC's feature-space spherical geometry model. Therefore, we do not use them to guide parameter selection, instead designing an SVC-specific scoring function.
